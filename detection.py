@@ -7,11 +7,12 @@ img = cv2.imread(f'{SCREENSHOT_DIR}/379430_20210322013509_1.png')
 
 img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) 
 img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) 
-  
+
+main_img = img_gray
   
 stop_data = cv2.CascadeClassifier('data\\1\\cascade.xml') 
 
-found = stop_data.detectMultiScale(img,  
+found = stop_data.detectMultiScale(main_img,  
                                    minSize = (60, 60), maxSize = (100, 100)) 
   
 # Don't do anything if there's  

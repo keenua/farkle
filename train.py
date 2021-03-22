@@ -8,6 +8,8 @@ TRAIN_DIR = 'train'
 TRAIN_GRAY_DIR = 'train_gray'
 OPENCV_BIN_DIR = 'e:\\Work\\Libs\\opencv-3.4.13\\opencv\\build\\x64\\vc15\\bin\\'
 
+MAIN_DIR = TRAIN_GRAY_DIR
+
 def convert_to_gray():
     rmtree(TRAIN_GRAY_DIR, ignore_errors=True)
     mkdir(TRAIN_GRAY_DIR)
@@ -31,7 +33,7 @@ def generate_info():
     for i in range(1, 7):
         info_file = f'{i}.info'
         with open(info_file, 'w') as f:
-            dir = path.join(TRAIN_DIR, str(i))
+            dir = path.join(MAIN_DIR, str(i))
 
             for file in listdir(dir):
                 filepath = path.join(dir, file)
@@ -46,7 +48,7 @@ def generate_info():
                 if i == j:
                     continue
 
-                dir = path.join(TRAIN_DIR, 'bg' if j == 0 else str(j))
+                dir = path.join(MAIN_DIR, 'bg' if j == 0 else str(j))
                 for file in listdir(dir):
                     filepath = path.join(dir, file)
                     f.write(f'{filepath}\n')

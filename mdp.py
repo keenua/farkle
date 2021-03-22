@@ -78,6 +78,31 @@ def get_max_w(W: np.ndarray, dp: Dict, state: List[int], turn_points, banked, op
 
     return max_w
 
+def get_best_action(W: np.ndarray, state: List[int], turn_points: int, banked: int, opponent_banked) -> Tuple[int, bool]:
+    max_w = 0
+    keep = 0
+    should_roll = False
+
+    dp = dict()
+
+    for si, score in enumerate(state):
+        if score == 0:
+            continue
+
+        bank = get_bank_action_w(W, dp, banked + turn_points + score, opponent_banked)
+        if bank > max_w:
+            keep = si
+            should_roll = False
+            max_w = bank
+
+        roll = get_roll_action_w(W, dp, si, turn_points + score, banked, opponent_banked)
+        if roll > max_w:
+            keep = si
+            should_roll = True
+            max_w = roll
+
+    return (keep, should_roll)
+
 def update(shared_w: mp.Array, convergence: mp.Array, thread_index: int):
     convergence[thread_index] = 0
     dp = dict()

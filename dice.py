@@ -43,6 +43,28 @@ def score(dice:Dice) -> List[int]:
 
     return max_score
 
+def best_move(dice:Dice, discard: int) -> List[int]:
+    initial:Info = (0, dice, True)
+
+    queue = deque([initial])
+    max_score = [0] * len(dice)
+    best_moves = [dice] * len(dice)
+
+    while queue:
+        state = queue.pop()
+        for comb in all_combinations:
+            res = comb(state)
+            score, keep, worked = res
+            if worked:
+                kept = len(keep)
+                if score > max_score[kept]:
+                    max_score[kept] = score
+                    best_moves[kept] = keep
+
+                queue.append(res)
+
+    return best_moves[discard]
+
 def encode(moves: List[int]) -> int:
     res = 0
 
@@ -73,42 +95,12 @@ def get_probabilities(dice: int) -> Mapping[int, int]:
         result[k] *= factor
     return result
 
-def expected_value(dice: int, depth: int) -> Tuple[float, float]:
-    bust_chance = 0
-    ev_if_not_busted = 0
-
-    for hash, p in PROBS[dice - 1].items():
-        if hash == 0:
-            bust_chance += p
-            continue
-
-        state = decode(hash)
-        max_score = max(state)
-
-        if max_score > 0:
-            stop_ev = max_score * p
-            max_ev = stop_ev
-
-            if depth > 0:
-                for i, s in enumerate(state):
-                    if s > 0:
-                        reroll = 6 if i == 0 else i
-                        c_bust, continue_ev = expected_value(reroll, depth - 1)
-                        max_ev = max(continue_ev, max_ev)
-                
-            ev_if_not_busted += max_ev
-    
-    return bust_chance, ev_if_not_busted
-
-
-
-
 #print(expected_value(6, 3, 0, 1))
 # print(sum([len(p) for p in PROBS]))
 
-dice:Dice = [1, 1, 1]
-scores = score(dice)
-print(scores)
+# dice:Dice = [1, 1, 1]
+# scores = score(dice)
+# print(scores)
 # hash = encode(scores) 
 # print(hash)
 # print(decode(hash))
