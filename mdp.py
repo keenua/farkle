@@ -6,13 +6,13 @@ import multiprocessing as mp
 from multiprocessing import Process
 
 MAX_POINTS = 4000
-THREAD_COUNT = 16
+THREAD_COUNT = 14
 STATES = list(set([k for p in PROBS for k, _ in p.items()]))
 STATE_INDEXES = {s: i for i, s in enumerate(STATES)}
 
 POINT_STEPS = MAX_POINTS // 50
 W_SHAPE = (len(STATES), POINT_STEPS, POINT_STEPS, POINT_STEPS)
-LOAD_FROM_FILE = False
+LOAD_FROM_FILE = True
 SAVE_FILE_NAME = f'{MAX_POINTS}_parallel.pkl'
 
 def to_points(index: int) -> int:
@@ -37,21 +37,50 @@ def get_w(W: np.ndarray, state_hash: int, turn_points: int, banked: int, opponen
     s = STATE_INDEXES[state_hash]
     return W[s, to_index(turn_points), to_index(banked), to_index(opponent)]
 
-def get_bank_action_w(W: np.ndarray, banked: int, opponent: int) -> float:
-    opponent_w = sum([get_w(W, s, 0, opponent, banked) * p for s, p in SIX.items()])
-    return 1 - opponent_w
+def get_bank_action_w(W: np.ndarray, dp: Dict, banked: int, opponent: int) -> float:
+    key = (banked, opponent)
 
-def get_roll_action_w(W: np.ndarray, roll: int, turn_points: int, banked: int, opponent: int) -> float:
+    if key in dp:
+        return dp[key]
+
+    opponent_w = sum([get_w(W, s, 0, opponent, banked) * p for s, p in SIX.items()])
+    res = 1 - opponent_w
+    dp[key] = res
+    return res
+
+def get_roll_action_w(W: np.ndarray, dp: Dict, roll: int, turn_points: int, banked: int, opponent: int) -> float:
+    key = (roll, turn_points, banked, opponent)
+
+    if key in dp:
+        return dp[key]
+
     roll = 6 if roll == 0 else roll
     probs = PROBS[roll-1]
 
-    return sum([get_w(W, s, turn_points, banked, opponent) * p for s, p in probs.items()])
+    res = sum([get_w(W, s, turn_points, banked, opponent) * p for s, p in probs.items()])
+    dp[key] = res
+    return res
 
 def tonumpyarray(mp_arr):
     return np.frombuffer(mp_arr, dtype=float).reshape(W_SHAPE)
 
+def get_max_w(W: np.ndarray, dp: Dict, state: List[int], turn_points, banked, opponent_banked):
+    max_w = 0
+
+    for si, score in enumerate(state):
+        if score == 0:
+            continue
+
+        bank = get_bank_action_w(W, dp, banked + turn_points + score, opponent_banked)
+        roll = get_roll_action_w(W, dp, si, turn_points + score, banked, opponent_banked)
+        
+        max_w = max(bank, roll, max_w)
+
+    return max_w
+
 def update(shared_w: mp.Array, convergence: mp.Array, thread_index: int):
     convergence[thread_index] = 0
+    dp = dict()
 
     W = tonumpyarray(shared_w)
     it = np.nditer(W, flags=['multi_index'])
@@ -77,19 +106,10 @@ def update(shared_w: mp.Array, convergence: mp.Array, thread_index: int):
         opponent_banked = to_points(o)
 
         if state_hash == 0:
-            W[index] = get_bank_action_w(W, banked, opponent_banked)
+            W[index] = get_bank_action_w(W, dp, banked, opponent_banked)
             continue
 
-        max_w = 0
-
-        for si, score in enumerate(state):
-            if score == 0:
-                continue
-
-            bank = get_bank_action_w(W, banked + turn_points + score, opponent_banked)
-            roll = get_roll_action_w(W, si, turn_points + score, banked, opponent_banked)
-            
-            max_w = max(bank, roll, max_w)
+        max_w = get_max_w(W, dp, state, turn_points, banked, opponent_banked)
 
         convergence[thread_index] = max(abs(w - max_w), convergence[thread_index])
 
@@ -121,13 +141,10 @@ if __name__ == '__main__':
     step = 0
 
     convergence = mp.Array(ctypes.c_double, [1.0] * THREAD_COUNT, lock=False)
-    while max(convergence) > 0.000001:
+    while max(convergence) > 0:
         update_parallel(shared_w, convergence)
         step += 1
         np.save(SAVE_FILE_NAME, w)
-        # 17
-        # 0.006162321731698117
-        # 12: 0.04059741952528828
         print('-----------\n')
         print(f'{step}: {max(convergence)}')
 
