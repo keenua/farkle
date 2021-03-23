@@ -1,5 +1,7 @@
+from recognition import recognize
 import cv2
 from matplotlib import pyplot as plt
+import numpy as np
 
 SCREENSHOT_DIR = 'e:\\Games\\Steam\\Screenshots'
 OY,OX = (300, 600)
@@ -19,11 +21,16 @@ amount_found = len(found)
   
 if amount_found != 0: 
     for (x, y, width, height) in found: 
-        cv2.rectangle(img_rgb, (x + OX, y + OY),  
-                      (x + OX + height, y + OY + width),  
-                      (0, 255, 0), 5) 
+        x1,y1,x2,y2=(x + OX, y + OY, x + OX + height, y + OY + width)
+        die = img[y1:y2, x1:x2]
+
+        res = recognize(die)
+        print(res)
+
+        plt.subplot(1, 1, 1) 
+        plt.imshow(img_rgb[y1:y2, x1:x2]) 
+        plt.show()
+
+
           
-plt.subplot(1, 1, 1) 
-plt.imshow(img_rgb) 
-plt.show()
 
