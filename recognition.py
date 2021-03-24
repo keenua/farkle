@@ -46,6 +46,8 @@ def prepare_samples():
 def train():
     x_train, x_test, y_train, y_test = prepare_samples()
 
+    print(f'Train samples: {len(x_train)}')
+
     input_shape = (SHAPE[0], SHAPE[1], 1)
 
     model = Sequential()
@@ -59,7 +61,7 @@ def train():
     model.compile(optimizer='adam', 
                 loss='sparse_categorical_crossentropy', 
                 metrics=['accuracy'])
-    model.fit(x=x_train,y=y_train, epochs=20)
+    model.fit(x=x_train,y=y_train, epochs=30)
 
     model.evaluate(x_test, y_test)
     model.save(MODEL_NAME, overwrite=True)
@@ -72,3 +74,6 @@ def recognize(img: np.ndarray) -> int:
     vec = vector(img)
     vec = vec[np.newaxis, ...]
     return model.predict(vec).argmax() + 1
+
+if __name__ == '__main__':
+    train()

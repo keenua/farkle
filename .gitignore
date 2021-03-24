@@ -2,4 +2,3 @@
 *.npy
 env
 train
-data

@@ -19,7 +19,7 @@ def text(img: np.ndarray, text: str, pos: Tuple[int, int]):
         lineType)
 
 while True:
-    img = grab_screen((600, 300, 1500, 900))
+    img = grab_screen((600, 200, 1500, 900))
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
 
     classifier = cv2.CascadeClassifier('data\\all\\cascade.xml') 
