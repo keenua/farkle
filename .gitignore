@@ -2,3 +2,4 @@
 *.npy
 env
 train
+train_gray

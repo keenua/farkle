@@ -27,8 +27,9 @@ def prepare_samples():
     X = np.empty((0, SHAPE[0], SHAPE[1], 1),dtype=np.bool)
     Y = np.empty((0), dtype=np.byte)
 
-    for i in range(1, 7):
-        name = str(i)
+    for i in range(0, 7):
+
+        name = 'bg' if i == 0 else str(i)
         dir = path.join(TRAIN_DIR, name)
 
         for file in listdir(dir):
@@ -39,7 +40,7 @@ def prepare_samples():
             resized = vec[np.newaxis, ...]
 
             X = np.append(X, resized, axis=0)
-            Y = np.append(Y, i - 1)
+            Y = np.append(Y, i)
 
     return train_test_split(X, Y, test_size=0.1)
 
@@ -51,17 +52,17 @@ def train():
     input_shape = (SHAPE[0], SHAPE[1], 1)
 
     model = Sequential()
-    model.add(Conv2D(10, kernel_size=(3,3), input_shape=input_shape))
+    model.add(Conv2D(20, kernel_size=(3,3), input_shape=input_shape))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Flatten()) # Flattening the 2D arrays for fully connected layers
-    model.add(Dense(64, activation=tf.nn.relu))
+    model.add(Dense(128, activation=tf.nn.relu))
     model.add(Dropout(0.2))
-    model.add(Dense(6,activation=tf.nn.softmax))
+    model.add(Dense(7,activation=tf.nn.softmax))
 
     model.compile(optimizer='adam', 
                 loss='sparse_categorical_crossentropy', 
                 metrics=['accuracy'])
-    model.fit(x=x_train,y=y_train, epochs=30)
+    model.fit(x=x_train,y=y_train, epochs=20)
 
     model.evaluate(x_test, y_test)
     model.save(MODEL_NAME, overwrite=True)
@@ -73,7 +74,7 @@ def recognize(img: np.ndarray) -> int:
 
     vec = vector(img)
     vec = vec[np.newaxis, ...]
-    return model.predict(vec).argmax() + 1
+    return model.predict(vec).argmax()
 
 if __name__ == '__main__':
     train()

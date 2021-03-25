@@ -28,7 +28,10 @@ paused_status = False
 
 classifier = cv2.CascadeClassifier('data\\all\\cascade.xml') 
 save_to = 'e:\\Work\\Projects\\farkle\\train\\under\\'
+save_bg_to = 'e:\\Work\\Projects\\farkle\\train\\under\\bg'
+
 dice = []
+bg = None
 
 while True:
     pressed = key_check()
@@ -44,21 +47,31 @@ while True:
         print(f'{len(dice)} images saved!')
         continue
 
+    if bg is not None and 'B' in pressed:
+        file = path.join(save_bg_to, f'{uuid4()}.png')
+        cv2.imwrite(file, bg)
+        print(f'background image saved!')
+
     if paused_status: 
         print("Paused... (y)")
         time.sleep(1)
         continue
     
-    img = grab_screen((600, 300, 1500, 900))
+    img = grab_screen((600, 200, 1500, 900))
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
 
     found = classifier.detectMultiScale(img, minSize = (75, 75), maxSize = (95, 95)) 
 
     dice = []
+    bg = img.copy()
     for (x, y, width, height) in found:
-        cv2.rectangle(img, (x, y), (x + height, y + width), (0, 255, 0), 5) 
         die = img[y:y+width,x:x+height].copy()
-        dice.append((recognize(die), x, y, die))
+        value = recognize(die)
+
+        if value != 0:
+            cv2.rectangle(img, (x, y), (x + height, y + width), (0, 255, 0), 5) 
+            bg[y:y+width, x:x+height] = np.zeros((width, height, 4))
+            dice.append((recognize(die), x, y, die))
     
     for (value, x, y, _) in dice:
         text(img, str(value), (x, y))

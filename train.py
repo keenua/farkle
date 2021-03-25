@@ -7,6 +7,7 @@ import subprocess
 TRAIN_DIR = 'train'
 TRAIN_GRAY_DIR = 'train_gray'
 OPENCV_BIN_DIR = 'e:\\Work\\Libs\\opencv-3.4.13\\opencv\\build\\x64\\vc15\\bin\\'
+BG_DIRS = ['actual_bg']
 
 MAIN_DIR = TRAIN_DIR
 
@@ -44,10 +45,11 @@ def generate_info():
 
     bg_file = f'all_bg.txt'
     with open(bg_file, 'w') as f:
-        dir = path.join(MAIN_DIR, 'bg')
-        for file in listdir(dir):
-            filepath = path.join(dir, file)
-            f.write(f'{filepath}\n')
+        for bg_dir in BG_DIRS:
+            dir = path.join(MAIN_DIR, bg_dir)
+            for file in listdir(dir):
+                filepath = path.join(dir, file)
+                f.write(f'{filepath}\n')
 
 
 def create_samples():
@@ -72,7 +74,7 @@ def create_samples():
         num_neg = len(f.readlines())
 
     subprocess.run([createsamples_app, '-info', info_file, '-num', str(num), '-vec', vec_file])
-    subprocess.run([traincascade_app, '-data', data_dir, '-vec', vec_file, '-bg', bg_file, '-numPos', str(int(num*0.95)), '-numNeg', str(num_neg), '-numStages', '15', '-featureType', 'LBP'])
+    subprocess.run([traincascade_app, '-data', data_dir, '-vec', vec_file, '-bg', bg_file, '-numPos', str(int(num*0.95)), '-numNeg', str(num_neg), '-numStages', '10', '-minHitRate', '0.999', '-maxFalseAlarmRate', '0.1', '-featureType', 'LBP'])
 
 def remove_file(name: str):
     tmp_files = ['.info', '.vec', '_bg.txt']
