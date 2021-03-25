@@ -50,6 +50,8 @@ for f in listdir(SCREENSHOT_DIR):
         cv2.drawContours(imgcont, [c], 0, (0,255,0), 1)
 
         if area < 5000 and area > 1800:
+            x,y,w,h = cv2.boundingRect(c)
+            cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
             cv2.drawContours(mask, [c], 0, 255, -1)
 
     out = cv2.bitwise_and(out, out, mask=mask)

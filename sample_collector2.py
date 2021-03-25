@@ -1,3 +1,4 @@
+from detection2 import detect
 import time
 from typing import *
 
@@ -26,7 +27,6 @@ def text(img: np.ndarray, text: str, pos: Tuple[int, int]):
 
 paused_status = False
 
-classifier = cv2.CascadeClassifier('data\\all\\cascade.xml') 
 save_to = 'e:\\Work\\Projects\\farkle\\train\\under\\'
 save_bg_to = 'e:\\Work\\Projects\\farkle\\train\\under\\bg'
 
@@ -57,19 +57,17 @@ while True:
         time.sleep(1)
         continue
     
-    img = grab_screen((600, 200, 1500, 800))
+    img = grab_screen((600, 200, 1499, 799))
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
-
-    found = classifier.detectMultiScale(img, minSize = (75, 75), maxSize = (95, 95)) 
 
     dice = []
     bg = img.copy()
-    for (x, y, width, height) in found:
-        die = img[y:y+width,x:x+height].copy()
+    for (x, y, width, height) in detect(img):
+        die = img[y:y+height,x:x+width].copy()
         value = recognize(die)
 
+        cv2.rectangle(img, (x, y), (x + height, y + width), (0, 255, 0), 5) 
         if value != 0:
-            cv2.rectangle(img, (x, y), (x + height, y + width), (0, 255, 0), 5) 
             bg[y:y+width, x:x+height] = np.zeros((width, height, 4))
             dice.append((recognize(die), x, y, die))
     

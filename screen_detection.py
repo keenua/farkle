@@ -18,11 +18,12 @@ def text(img: np.ndarray, text: str, pos: Tuple[int, int]):
         fontColor,
         lineType)
 
+classifier = cv2.CascadeClassifier('data\\all\\cascade.xml') 
+
 while True:
     img = grab_screen((600, 200, 1500, 900))
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
 
-    classifier = cv2.CascadeClassifier('data\\all\\cascade.xml') 
     found = classifier.detectMultiScale(img, minSize = (75, 75), maxSize = (95, 95)) 
 
     dice = []
