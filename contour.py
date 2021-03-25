@@ -13,24 +13,30 @@ for f in listdir(SCREENSHOT_DIR):
     img = cv2.imread(p)
     img = img[OY:OY+H, OX:OX+W]
 
-    colors = []
+    # colors = []
 
-    for c in range(85, 145, 2):
-        colors.append((c, c + 21))
+    # for c in range(85, 145, 2):
+    #     colors.append((c, c + 21))
 
-    for c in range(40, 55, 2):
-        colors.append((c, c + 12))
+    # for c in range(40, 55, 2):
+    #     colors.append((c, c + 12))
 
-    mask = np.zeros((H, W), dtype= 'uint8')
+    # mask = np.zeros((H, W), dtype= 'uint8')
 
-    for l, u in colors:
-        lower = np.array([l] * 3, dtype = 'uint8')
-        upper = np.array([u] * 3, dtype = 'uint8')
+    # for l, u in colors:
+    #     lower = np.array([l] * 3, dtype = 'uint8')
+    #     upper = np.array([u] * 3, dtype = 'uint8')
 
-        c_mask = cv2.inRange(img, lower, upper)
-        mask = cv2.bitwise_or(mask, c_mask)
+    #     c_mask = cv2.inRange(img, lower, upper)
+    #     mask = cv2.bitwise_or(mask, c_mask)
 
-    blur = cv2.bitwise_and(img, img, mask = mask)
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    lower_gray = np.array([21, 6, 0], np.uint8)
+    upper_gray = np.array([124, 71, 255], np.uint8)
+    mask_gray = cv2.inRange(hsv, lower_gray, upper_gray)
+    img_res = cv2.bitwise_and(img, img, mask = mask_gray)
+
+    blur = cv2.bitwise_and(img, img, mask = mask_gray)
     blur = cv2.cvtColor(blur,cv2.COLOR_BGR2GRAY)
     flag, thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV)
 
@@ -50,7 +56,8 @@ for f in listdir(SCREENSHOT_DIR):
         cv2.drawContours(imgcont, [c], 0, (0,255,0), 1)
 
         if area < 5000 and area > 1800:
-            x,y,w,h = cv2.boundingRect(c)
+            rect = cv2.boundingRect(c)
+            x,y,w,h = rect
             cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
             cv2.drawContours(mask, [c], 0, 255, -1)
 
