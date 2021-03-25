@@ -13,23 +13,6 @@ for f in listdir(SCREENSHOT_DIR):
     img = cv2.imread(p)
     img = img[OY:OY+H, OX:OX+W]
 
-    # colors = []
-
-    # for c in range(85, 145, 2):
-    #     colors.append((c, c + 21))
-
-    # for c in range(40, 55, 2):
-    #     colors.append((c, c + 12))
-
-    # mask = np.zeros((H, W), dtype= 'uint8')
-
-    # for l, u in colors:
-    #     lower = np.array([l] * 3, dtype = 'uint8')
-    #     upper = np.array([u] * 3, dtype = 'uint8')
-
-    #     c_mask = cv2.inRange(img, lower, upper)
-    #     mask = cv2.bitwise_or(mask, c_mask)
-
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     lower_gray = np.array([21, 6, 0], np.uint8)
     upper_gray = np.array([124, 71, 255], np.uint8)

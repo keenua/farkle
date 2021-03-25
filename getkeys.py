@@ -2,11 +2,11 @@
 # avail: https://raw.githubusercontent.com/Sentdex/pygta5/master/getkeys.py
 
 import win32api as wapi
-import time
 
 keyList = ["\b"]
 for char in "ABCDEFGHIJKLMNOPQRSTUVWXYZ 123456789,.'£$/\\":
     keyList.append(char)
+
 
 def key_check():
     keys = []
@@ -14,4 +14,8 @@ def key_check():
         if wapi.GetAsyncKeyState(ord(key)):
             keys.append(key)
     return keys
- 
+
+def new_keys(prev):
+    all = key_check()
+    new = set(all) - set(prev)
+    return new, all

@@ -3,7 +3,7 @@ from imutils import paths
 import numpy as np
 from os import remove
 
-DIR = 'train\\under'
+DIR = 'train'
 
 def dhash(image, hashSize=8):
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)

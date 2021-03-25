@@ -1,20 +1,26 @@
 import cv2
 import numpy as np
 
-FILE = 'e:\\Work\\ProjectFiles\\farkle\\screenshots\\379430_20210322013509_1.png'
+#FILE = 'e:\\Work\\ProjectFiles\\farkle\\screenshots\\379430_20210322013509_1.png'
+FILE = 'e:\\Work\\Projects\\farkle\\train\\6\\01925020-cd49-48fe-a774-fe600021bf7c.png'
 OY, OX = (200, 600)
 H, W = (600, 900)
+
+SCALE = 100
+CROP = False
+
 name = 'image'
 
 main = cv2.imread(FILE)
-main = main[OY:OY+H, OX:OX+W]
 
+if CROP:
+    main = main[OY:OY+H, OX:OX+W]
 
 def nothing(x):
     pass
 
 
-def show_image(img, lower, upper):
+def show_image(img, lower, upper, t):
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     lower_gray = np.array(lower, np.uint8)
     upper_gray = np.array(upper, np.uint8)
@@ -23,7 +29,7 @@ def show_image(img, lower, upper):
 
     blur = cv2.bitwise_and(img, img, mask=mask_gray)
     blur = cv2.cvtColor(blur, cv2.COLOR_BGR2GRAY)
-    flag, thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV)
+    flag, thresh = cv2.threshold(blur, t[0], t[1], cv2.THRESH_BINARY_INV)
 
     # Find contours
     im2, contours, hierarchy = cv2.findContours(
@@ -53,17 +59,21 @@ def show_image(img, lower, upper):
     row2 = np.hstack((cv2.cvtColor(imgcont, cv2.COLOR_RGBA2BGR), cv2.cvtColor(out, cv2.COLOR_RGBA2BGR)))
     to_show = np.vstack((row1, row2))
 
-    scale_percent = 25
-    width = int(to_show.shape[1] * scale_percent / 100)
-    height = int(to_show.shape[0] * scale_percent / 100)
-    to_show = cv2.resize(to_show, (width, height))
+    if SCALE != 100:
+        width = int(to_show.shape[1] * SCALE / 100)
+        height = int(to_show.shape[0] * SCALE / 100)
+        to_show = cv2.resize(to_show, (width, height))
+
     cv2.imshow(name, to_show)
 
 cv2.namedWindow(name)
 
-[h1, s1, v1]=[0, 5, 50]
-[h2, s2, v2]=[179, 50, 255]
-
+# [h1, s1, v1]=[0, 5, 50]
+# [h2, s2, v2]=[179, 50, 255]
+[h1, s1, v1]=[50,0,0]
+[h2, s2, v2]=[255,255,75]
+t1 = 0
+t2 = 255
 
 # create trackbars for color change
 cv2.createTrackbar('H1', name, h1, 255, nothing)
@@ -73,8 +83,11 @@ cv2.createTrackbar('H2', name, h2, 255, nothing)
 cv2.createTrackbar('S2', name, s2, 255, nothing)
 cv2.createTrackbar('V2', name, v2, 255, nothing)
 
+cv2.createTrackbar('T1', name, t1, 255, nothing)
+cv2.createTrackbar('T2', name, t2, 255, nothing)
+
 while(1):
-    show_image(main.copy(), [h1, s1, v1], [h2, s2, v2])
+    show_image(main.copy(), [h1, s1, v1], [h2, s2, v2], [t1, t2])
     k=cv2.waitKey(1) & 0xFF
     if k == 27:
         break
@@ -88,6 +101,7 @@ while(1):
     s2=cv2.getTrackbarPos('S2', name)
     v2=cv2.getTrackbarPos('V2', name)
 
-
+    t1=cv2.getTrackbarPos('T1', name)
+    t2=cv2.getTrackbarPos('T2', name)
 
 cv2.destroyAllWindows()
