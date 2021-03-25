@@ -13,20 +13,30 @@ for f in listdir(SCREENSHOT_DIR):
     img = cv2.imread(p)
     img = img[OY:OY+H, OX:OX+W]
 
-    # Prepocess
-    # create NumPy arrays from the boundaries
-    lower = np.array([90,90,90], dtype = "uint8")
-    upper = np.array([150,150,150], dtype = "uint8")
+    colors = []
 
-    # find the colors within the specified boundaries and apply
-    # the mask
-    mask = cv2.inRange(img, lower, upper)
+    for c in range(85, 145, 2):
+        colors.append((c, c + 21))
+
+    for c in range(40, 55, 2):
+        colors.append((c, c + 12))
+
+    mask = np.zeros((H, W), dtype= 'uint8')
+
+    for l, u in colors:
+        lower = np.array([l] * 3, dtype = 'uint8')
+        upper = np.array([u] * 3, dtype = 'uint8')
+
+        c_mask = cv2.inRange(img, lower, upper)
+        mask = cv2.bitwise_or(mask, c_mask)
+
     blur = cv2.bitwise_and(img, img, mask = mask)
     blur = cv2.cvtColor(blur,cv2.COLOR_BGR2GRAY)
     flag, thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV)
 
     #Find contours
     im2, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+
     contours = sorted(contours, key=cv2.contourArea, reverse=True) 
 
     imgcont = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
