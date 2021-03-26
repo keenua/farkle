@@ -65,3 +65,22 @@ def add_whitespace_around(img, add_h=2, add_w=2):
     result = np.full((h + add_h * 2, w + add_w * 2), 255, dtype='uint8')
     result[add_h:h+add_h, add_w:w+add_w] = img
     return result
+
+
+def detect_contours(img, color_range:ColorRange):
+    result = []
+
+    img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
+    thresh = thresh_by_color(img, color_range)
+    contours = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)[1]
+
+    for c in contours:
+        area = cv2.contourArea(c)
+        bounding_rect = cv2.boundingRect(c)
+        result.append((c, area, bounding_rect))
+
+    return result
+
+def center(rect) -> np.ndarray:
+    (x, y, width, height) = rect
+    return np.array((x + width // 2, y + height //2))

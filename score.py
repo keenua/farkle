@@ -56,8 +56,12 @@ def recognize_score(screenshot: str = None) -> Score:
         img = remove_whitespace(img)
         img = add_whitespace_around(img, 10, 0)
 
-        text = image_to_string(
-            img, config='--psm 7 --oem 3 -c tessedit_char_whitelist=0123456789')
+        try:
+            text = image_to_string(
+                img, config='--psm 7 --oem 3 -c tessedit_char_whitelist=0123456789')
+        except:
+            text = None
+
         scores[n] = text
 
         if SHOW_IMAGES:

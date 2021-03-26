@@ -26,43 +26,20 @@ def fix_rotation(img, cnt):
 def detect_dice(img):
     result = []
 
-    img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
-    thresh = thresh_by_color(img, GRAY)
-    contours = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)[1]
+    contours = detect_contours(img, GRAY)
 
-    imgcont = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
-
-    for c in contours:
-        area = cv2.contourArea(c)
-        cv2.drawContours(imgcont, [c], 0, (0,255,0), 1)
-
+    for contour, area, rect in contours:
         if 1800 < area < 5000:
-            res = fix_rotation(img, c)
-            rect = cv2.boundingRect(c)
+            res = fix_rotation(img, contour)
             result.append((rect, res))
 
     return result
 
 def detect_hold_markers(img):
-    result = []
+    return [center(rect) for _, area, rect in detect_contours(img, ORANGE) if 300 < area < 5000]
 
-    img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
-    thresh = thresh_by_color(img, ORANGE)
-    contours = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)[1]
-
-    imgcont = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
-
-    for c in contours:
-        area = cv2.contourArea(c)
-        cv2.drawContours(imgcont, [c], 0, (0,255,0), 1)
-
-        if 1800 < area < 5000:
-            res = fix_rotation(img, c)
-            rect = cv2.boundingRect(c)
-            result.append((rect, res))
-
-    return result
-
+def detect_selection_marker(img):
+    return [center(rect) for _, area, rect in detect_contours(img, YELLOW) if 300 < area < 5000]
 
 if __name__ == '__main__':
     SCREENSHOT_DIR = 'e:\\Games\\Steam\\Screenshots'
