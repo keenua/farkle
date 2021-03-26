@@ -1,40 +1,26 @@
-from time import sleep
+from os import listdir, path
 from typing import *
 
 import cv2
 from pytesseract import image_to_string
 
 from grabscreen import grab_screen
-from imageutils import (ColorModel, add_whitespace_around, remove_whitespace,
-                        thresh_by_color)
+from imageutils import *
 
-FILE = 'e:\\Work\\ProjectFiles\\farkle\\train_old2\\test.png'
+PATH = 'e:\\Work\\ProjectFiles\\farkle\\train_old2\\test2.png'
+# PATH = 'e:\\Work\\ProjectFiles\\farkle\\screenshots\\'
 
-FROM_SCREEN = False
 SAVE_SCREENSHOTS = False
 SHOW_IMAGES = False
 
-screenshot = None
-
-
-def __from_screenshot(p):
-    global screenshot
-    x1, y1, x2, y2 = p
-    if screenshot is None:
-        screenshot = cv2.imread(FILE)
-    return screenshot[y1:y2, x1:x2].copy()
-
-
-grab = grab_screen if FROM_SCREEN else __from_screenshot
-
 LABELS = {
-    'goal': ((80, 40, 150, 90), [100, 0, 0], [255, 50, 50], ColorModel.RGB, True),
-    'opp_total': ((85, 72, 190, 125), [0, 0, 0], [255, 255, 200], ColorModel.HSV, False),
-    'opp_round': ((100, 134, 195, 187), [100, 0, 0], [255, 30, 255], ColorModel.RGB, True),
-    'opp_selected': ((100, 133 + 69, 195, 186 + 69), [100, 0, 0], [255, 30, 255], ColorModel.RGB, True),
-    'hero_total': ((85, 867, 190, 920), [0, 0, 0], [255, 255, 200], ColorModel.HSV, False),
-    'hero_round': ((100, 1000-69, 195, 1053-69), [0, 0, 60], [255, 255, 255], ColorModel.HSV, False),
-    'hero_selected': ((100, 1000, 195, 1053), [0, 0, 60], [255, 255, 255], ColorModel.HSV, False),
+    'goal': ((80, 40, 150, 90), RED),
+    'opp_total': ((85, 76, 190, 115), YELLOW),
+    'opp_round': ((85, 134, 195, 187), BRED),
+    'opp_selected': ((85, 202, 195, 255), RED),
+    'hero_total': ((85, 867, 190, 920), YELLOW),
+    'hero_round': ((85, 931, 195, 984), BLACK),
+    'hero_selected': ((85, 1000, 195, 1053), BLACK),
 }
 
 
@@ -59,14 +45,14 @@ def __text_to_int(text: str, default: int = 0) -> int:
         return default
 
 
-def recognize_score() -> Score:
+def recognize_score(screenshot: str = None) -> Score:
     scores = dict()
-    for n, (p, l, u, cm, inv) in LABELS.items():
-        img = grab(p)
+    for n, (p, range) in LABELS.items():
+        img = grab_screen(p, screenshot)
         if SAVE_SCREENSHOTS:
             cv2.imwrite(f'{n}.png', img)
 
-        img = thresh_by_color(img, l, u, cm, inv)
+        img = thresh_by_color(img, range)
         img = remove_whitespace(img)
         img = add_whitespace_around(img, 10, 0)
 
@@ -84,5 +70,19 @@ def recognize_score() -> Score:
 
 if __name__ == '__main__':
     while True:
-        score = recognize_score()
-        print(score.__dict__)
+        if path.isdir(PATH):
+            for f in listdir(PATH):
+                p = path.join(PATH, f)
+                score = recognize_score(p)
+
+                print(score.__dict__)
+
+                img = cv2.imread(p)
+                cv2.imshow('window', cv2.resize(img, (800, 600)))
+                cv2.waitKey(0)
+        else:
+            score = recognize_score(PATH)
+            print(score.__dict__)
+
+        if PATH is not None and path.isfile(PATH):
+            break

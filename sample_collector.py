@@ -6,7 +6,7 @@ from uuid import uuid4
 import cv2
 import numpy as np
 
-from detection import detect
+from detection import detect_dice
 from getkeys import new_keys
 from grabscreen import grab_screen
 from recognition import recognize
@@ -58,7 +58,7 @@ while True:
     img = grab_screen((600, 200, 1500, 900))
 
     dice = []
-    for (x, y, width, height), die  in detect(img):
+    for (x, y, width, height), die in detect_dice(img):
         cv2.rectangle(img, (x, y), (x + width, y + height), (0, 255, 0), 5) 
 
         value = recognize(die)

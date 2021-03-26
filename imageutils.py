@@ -10,6 +10,16 @@ class ColorModel(Enum):
     HSV = 2
 
 
+ColorRange = Tuple[ColorModel, List[int], List[int], bool]
+
+ORANGE: ColorRange = (ColorModel.RGB, [100, 0, 0], [255, 100, 50], True)
+GRAY: ColorRange = (ColorModel.HSV, [21, 6, 0], [124, 71, 255], True)
+BRED: ColorRange = (ColorModel.RGB, [100, 0, 0], [255, 30, 255], True)
+RED: ColorRange = (ColorModel.RGB, [100, 0, 0], [255, 50, 50], True)
+BLACK: ColorRange = (ColorModel.HSV, [0, 0, 60], [255, 255, 255], False)
+YELLOW: ColorRange = (ColorModel.HSV, [0, 0, 0], [255, 255, 200], False)
+
+
 def random_size() -> Tuple[int, int]:
     min_w, max_w = (60, 90)
     min_h, max_h = (60, 90)
@@ -20,7 +30,9 @@ def random_size() -> Tuple[int, int]:
     return (w, h)
 
 
-def thresh_by_color(img: np.ndarray, lower: List[int], upper: List[int], color_model: ColorModel = ColorModel.RGB, invert: bool = False) -> np.ndarray:
+def thresh_by_color(img: np.ndarray, color_range: ColorRange) -> np.ndarray:
+    (color_model, lower, upper, invert) = color_range
+
     lowerb = np.array(lower, np.uint8)
     upperb = np.array(upper, np.uint8)
 

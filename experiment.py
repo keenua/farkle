@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 
-#FILE = 'e:\\Work\\ProjectFiles\\farkle\\screenshots\\379430_20210322013509_1.png'
-FILE = 'e:\\Work\\Projects\\farkle\\train\\6\\01925020-cd49-48fe-a774-fe600021bf7c.png'
+FILE = 'e:\\Work\\ProjectFiles\\farkle\\screenshots\\379430_20210322013651_1.png'
+# FILE = 'e:\\Work\\Projects\\farkle\\train\\6\\01925020-cd49-48fe-a774-fe600021bf7c.png'
 OY, OX = (200, 600)
 H, W = (600, 900)
 
@@ -12,6 +12,9 @@ CROP = False
 name = 'image'
 
 main = cv2.imread(FILE)
+
+cv2.namedWindow(name, cv2.WINDOW_NORMAL)
+cv2.resizeWindow(name, 600, 1200) 
 
 if CROP:
     main = main[OY:OY+H, OX:OX+W]
@@ -59,10 +62,7 @@ def show_image(img, lower, upper, t):
     row2 = np.hstack((cv2.cvtColor(imgcont, cv2.COLOR_RGBA2BGR), cv2.cvtColor(out, cv2.COLOR_RGBA2BGR)))
     to_show = np.vstack((row1, row2))
 
-    if SCALE != 100:
-        width = int(to_show.shape[1] * SCALE / 100)
-        height = int(to_show.shape[0] * SCALE / 100)
-        to_show = cv2.resize(to_show, (width, height))
+    to_show = cv2.resize(to_show, (800, 600))
 
     cv2.imshow(name, to_show)
 

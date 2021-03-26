@@ -1,24 +1,16 @@
-from pytesseract.pytesseract import image_to_string
-from imageutils import ColorModel, thresh_by_color
+from imageutils import *
 import cv2
 import numpy as np
 
-# FILE = 'e:\\Work\\ProjectFiles\\farkle\\screenshots\\379430_20210322013509_1.png'
-FILE = 'opp_round.png'
+FILE = 'e:\\Work\\ProjectFiles\\farkle\\train_old2\\test.png'
+#FILE = 'opp_round.png'
 OY, OX = (200, 600)
 H, W = (600, 900)
 
-
-COLOR_MODEL = ColorModel.RGB
-INVERT = True
 SCALE = 100
 CROP = False
 
-[h1, s1, v1]=[100,0,0]
-[h2, s2, v2]=[255,50,50]
-
-# [h1, s1, v1]=[0, 5, 50]
-# [h2, s2, v2]=[179, 50, 255]
+(COLOR_MODEL, [h1, s1, v1], [h2, s2, v2], _) = RED
 
 name = 'image'
 
@@ -33,8 +25,8 @@ def nothing(x):
     pass
 
 
-def show_image(img, lower, upper, t):
-    thresh = thresh_by_color(img, lower, upper, COLOR_MODEL, INVERT)
+def show_image(img, color_range, t):
+    thresh = thresh_by_color(img, color_range)
     to_show = np.hstack((img, cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR)))
 
     if SCALE != 100:
@@ -61,7 +53,7 @@ cv2.createTrackbar('T1', name, t1, 255, nothing)
 cv2.createTrackbar('T2', name, t2, 255, nothing)
 
 while(1):
-    show_image(main.copy(), [h1, s1, v1], [h2, s2, v2], [t1, t2])
+    show_image(main.copy(), (COLOR_MODEL, [h1, s1, v1], [h2, s2, v2]), [t1, t2])
     k=cv2.waitKey(1) & 0xFF
     if k == 27:
         break

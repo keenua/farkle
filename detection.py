@@ -1,3 +1,4 @@
+from imageutils import *
 from recognition import recognize
 import cv2
 from matplotlib import pyplot as plt
@@ -22,19 +23,11 @@ def fix_rotation(img, cnt):
     warped = cv2.warpPerspective(img, M, (width, height))
     return warped
 
-def detect(img):
+def detect_dice(img):
     result = []
 
     img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    lower_gray = np.array([21, 6, 0], np.uint8)
-    upper_gray = np.array([124, 71, 255], np.uint8)
-    mask_gray = cv2.inRange(hsv, lower_gray, upper_gray)
-
-    blur = cv2.bitwise_and(img, img, mask = mask_gray)
-    blur = cv2.cvtColor(blur,cv2.COLOR_BGR2GRAY)
-    thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV)[1]
-
+    thresh = thresh_by_color(img, GRAY)
     contours = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)[1]
 
     imgcont = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
@@ -50,6 +43,27 @@ def detect(img):
 
     return result
 
+def detect_hold_markers(img):
+    result = []
+
+    img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
+    thresh = thresh_by_color(img, ORANGE)
+    contours = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)[1]
+
+    imgcont = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
+
+    for c in contours:
+        area = cv2.contourArea(c)
+        cv2.drawContours(imgcont, [c], 0, (0,255,0), 1)
+
+        if 1800 < area < 5000:
+            res = fix_rotation(img, c)
+            rect = cv2.boundingRect(c)
+            result.append((rect, res))
+
+    return result
+
+
 if __name__ == '__main__':
     SCREENSHOT_DIR = 'e:\\Games\\Steam\\Screenshots'
     OY,OX = (200, 600)
@@ -59,7 +73,7 @@ if __name__ == '__main__':
     img = img[OY:OY+H, OX:OX+W]
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) 
 
-    for (x,y,w,h), die in detect(img):
+    for (x,y,w,h), die in detect_dice(img):
         res = recognize(die)
         print(res)
 
