@@ -55,8 +55,7 @@ while True:
         time.sleep(1)
         continue
     
-    img = grab_screen((600, 200, 1500, 800))
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
+    img = grab_screen((600, 200, 1500, 900))
 
     dice = []
     for (x, y, width, height), die  in detect(img):

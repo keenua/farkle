@@ -1,7 +1,4 @@
-from os import listdir, mkdir, path
-from shutil import rmtree
-from numpy.lib.npyio import load
-from scipy.sparse.construct import random
+from os import listdir, path
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 from tensorflow.keras.models import Sequential, load_model
