@@ -11,7 +11,7 @@ from score import Score, recognize_score
 
 DICE_REGION = (600, 200, 1500, 900)
 TURN_REGION = (1732, 800, 1733, 801)
-DEBUG = True
+DEBUG = False
 
 PATH = None# 'e:\\Work\\ProjectFiles\\farkle\\train_old2\\test2.png'
 
@@ -58,6 +58,9 @@ def recognize_dice(screenshot: str = None) -> List[Die]:
             cv2.rectangle(to_show, (x, y), (x + width,
                           y + height), (0, 255, 0), 5)
 
+    if not dice:
+        return []
+
     for (x, y) in detect_hold_markers(img):
         closest_die = __closest_die(dice, (x, y))
         closest_die.held = True
@@ -86,9 +89,12 @@ def recognize_turn(screenshot: str = None) -> bool:
 def recognize_state(screenshot: str = None) -> State:
     state = State()
 
+    if not recognize_turn(screenshot):
+        return state
+
+    state.is_hero_turn = True
     state.dice = recognize_dice(screenshot)
     state.score = recognize_score(screenshot)
-    state.is_hero_turn = recognize_turn(screenshot)
 
     return state
 
