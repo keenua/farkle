@@ -1,6 +1,6 @@
 A bot playing Farkle (a dice game) in the `Kingdom Come: Deliverance`
 
-It uses the (ostensibly) optimal strategy, which is a simplified variation of Markov Decision Process (MDP), see [mdp.py](src/farkle/visual/recognition.py).
+It uses the (ostensibly) optimal strategy, which is a simplified variation of Markov Decision Process (MDP), see [mdp.py](src/farkle/logic/mdp.py).
 The dice position detection is done using `OpenCV` and some image processing / contour detection algorithms exposed by the library, see [detection.py](src/farkle/visual/detection.py).
 The dice value recognition is handled by a simple convolutional neural network, see [recognition.py](src/farkle/visual/recognition.py).
 
