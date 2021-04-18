@@ -6,7 +6,7 @@ import multiprocessing as mp
 from multiprocessing import Process
 
 MAX_POINTS = 4000
-THREAD_COUNT = 10
+THREAD_COUNT = mp.cpu_count()
 STATES = list(set([k for p in PROBS for k, _ in p.items()]))
 STATE_INDEXES = {s: i for i, s in enumerate(STATES)}
 
