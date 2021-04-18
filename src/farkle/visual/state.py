@@ -1,20 +1,17 @@
-import numpy as np
-from imageutils import center
-from os import path, listdir
-from recognition import recognize
-import cv2
-from detection import detect_dice, detect_hold_markers, detect_selection_marker
-from grabscreen import grab_screen
+from os import listdir, path
 from typing import *
 
-from score import Score, recognize_score
+import cv2
+import numpy as np
+from farkle.utils import *
+from farkle.visual.detection import (detect_dice, detect_hold_markers,
+                                     detect_selection_marker)
+from farkle.visual.recognition import recognize
+from farkle.visual.score import Score, recognize_score
 
 DICE_REGION = (600, 200, 1500, 900)
 TURN_REGION = (1732, 800, 1733, 801)
 DEBUG = False
-
-PATH = None# 'e:\\Work\\ProjectFiles\\farkle\\train_old2\\test2.png'
-
 
 class Die:
     def __init__(self, value: int, rect: Tuple[int, int, int, int]):
@@ -106,11 +103,11 @@ def print_state(state: State):
         print(d.__dict__)
 
 
-if __name__ == '__main__':
+def demo(imgpath: str = None):
     while True:
-        if PATH is not None and path.isdir(PATH):
-            for f in listdir(PATH):
-                p = path.join(PATH, f)
+        if imgpath is not None and path.isdir(imgpath):
+            for f in listdir(imgpath):
+                p = path.join(imgpath, f)
                 state = recognize_state(p)
 
                 print_state(state)
@@ -118,9 +115,9 @@ if __name__ == '__main__':
                 img = cv2.imread(p)
                 cv2.imshow('window', cv2.resize(img, (800, 600)))
         else:
-            state = recognize_state(PATH)
+            state = recognize_state(imgpath)
             print_state(state)
             cv2.waitKey(10)
 
-        if PATH is not None and path.isfile(PATH):
+        if imgpath is not None and path.isfile(imgpath):
             break

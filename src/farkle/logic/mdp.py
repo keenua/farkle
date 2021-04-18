@@ -1,5 +1,5 @@
 from typing import *
-from probs import PROBS, SIX
+from .probs import PROBS, SIX
 import numpy as np
 import ctypes
 import multiprocessing as mp

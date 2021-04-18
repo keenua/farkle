@@ -1,7 +1,7 @@
 from typing import *
-from dice import best_move, score
+from .dice import Dice
 import numpy as np
-from mdp import get_best_action
+from .mdp import get_best_action
 
 MAX_POINTS = 4000
 W_FILE = f'{MAX_POINTS}_parallel.pkl.npy'
@@ -9,7 +9,7 @@ W_FILE = f'{MAX_POINTS}_parallel.pkl.npy'
 max_points_cache = None
 w_cache = None
 
-def move(dice: List[int], max_points: int, hero_round: int, hero_total: int, opp_total: int) -> Tuple[List[int], bool]:
+def move(dice_values: List[int], max_points: int, hero_round: int, hero_total: int, opp_total: int) -> Tuple[List[int], bool]:
     global max_points_cache
     global w_cache
 
@@ -17,10 +17,11 @@ def move(dice: List[int], max_points: int, hero_round: int, hero_total: int, opp
         max_points_cache = max_points
         w_cache = np.load(f'{max_points}_parallel.pkl.npy')
 
-    s = score(dice)
+    dice = Dice(dice_values)
+    score = dice.score()
 
-    (reroll, should_roll) = get_best_action(w_cache, s, hero_round, hero_total, opp_total)
-    move = best_move(dice, reroll)
+    (reroll, should_roll) = get_best_action(w_cache, score, hero_round, hero_total, opp_total)
+    move = dice.best_move(reroll)
 
     keep = sorted(dice.copy())
     for d in move:
@@ -35,7 +36,7 @@ if __name__ == '__main__':
         DICE = list(map(int, input('Dice: ').split()))
         BANKED = int(input('Banked: '))
         OPPONENT_BANKED = int(input('Opponent: '))
-        TURN_POINTS = int(input('Turn poitns: '))
+        TURN_POINTS = int(input('Turn points: '))
 
         (keep, should_roll) = move(DICE, MAX_POINTS, TURN_POINTS, BANKED, OPPONENT_BANKED)
 

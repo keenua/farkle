@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 
 FILE = 'e:\\Work\\ProjectFiles\\farkle\\screenshots\\379430_20210322013651_1.png'
-# FILE = 'e:\\Work\\Projects\\farkle\\train\\6\\01925020-cd49-48fe-a774-fe600021bf7c.png'
 OY, OX = (200, 600)
 H, W = (600, 900)
 

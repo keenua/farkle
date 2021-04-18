@@ -2,25 +2,21 @@ from os import listdir, path
 from typing import *
 
 import cv2
+from farkle.utils import (ColorRanges, add_whitespace_around,
+                          grab_screen, remove_whitespace)
 from pytesseract import image_to_string
-
-from grabscreen import grab_screen
-from imageutils import *
-
-PATH = 'e:\\Work\\ProjectFiles\\farkle\\train_old2\\test2.png'
-# PATH = 'e:\\Work\\ProjectFiles\\farkle\\screenshots\\'
 
 SAVE_SCREENSHOTS = False
 SHOW_IMAGES = False
 
 LABELS = {
-    'goal': ((80, 40, 150, 90), RED),
-    'opp_total': ((85, 76, 190, 115), YELLOW),
-    'opp_round': ((85, 134, 195, 187), BRED),
-    'opp_selected': ((85, 202, 195, 255), RED),
-    'hero_total': ((85, 867, 190, 920), YELLOW),
-    'hero_round': ((85, 931, 195, 984), BLACK),
-    'hero_selected': ((85, 1000, 195, 1053), BLACK),
+    'goal': ((80, 40, 150, 90), ColorRanges.RED),
+    'opp_total': ((85, 76, 190, 115), ColorRanges.YELLOW),
+    'opp_round': ((85, 134, 195, 187), ColorRanges.BRED),
+    'opp_selected': ((85, 202, 195, 255), ColorRanges.RED),
+    'hero_total': ((85, 867, 190, 920), ColorRanges.YELLOW),
+    'hero_round': ((85, 931, 195, 984), ColorRanges.BLACK),
+    'hero_selected': ((85, 1000, 195, 1053), ColorRanges.BLACK),
 }
 
 
@@ -52,7 +48,7 @@ def recognize_score(screenshot: str = None) -> Score:
         if SAVE_SCREENSHOTS:
             cv2.imwrite(f'{n}.png', img)
 
-        img = thresh_by_color(img, range)
+        img = range.threshold(img)
         img = remove_whitespace(img)
         img = add_whitespace_around(img, 10, 0)
 
@@ -72,11 +68,11 @@ def recognize_score(screenshot: str = None) -> Score:
     return score
 
 
-if __name__ == '__main__':
+def demo(imgpath: str):
     while True:
-        if path.isdir(PATH):
-            for f in listdir(PATH):
-                p = path.join(PATH, f)
+        if path.isdir(imgpath):
+            for f in listdir(imgpath):
+                p = path.join(imgpath, f)
                 score = recognize_score(p)
 
                 print(score.__dict__)
@@ -85,8 +81,8 @@ if __name__ == '__main__':
                 cv2.imshow('window', cv2.resize(img, (800, 600)))
                 cv2.waitKey(0)
         else:
-            score = recognize_score(PATH)
+            score = recognize_score(imgpath)
             print(score.__dict__)
 
-        if PATH is not None and path.isfile(PATH):
+        if imgpath is not None and path.isfile(imgpath):
             break

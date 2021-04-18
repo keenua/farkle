@@ -1,13 +1,15 @@
+import sys
 from typing import *
 
-import numpy as np
-from grabscreen import grab_screen
-from dm import move
-import sys
-from state import DICE_REGION, Die, recognize_state
 import cv2
+import numpy as np
+
+from farkle.logic.dm import move
+from farkle.utils import grab_screen
+from farkle.visual.state import DICE_REGION, Die, recognize_state
 
 MAX_POINTS = 4000
+
 
 def text(img: np.ndarray, text: str, pos: tuple):
     font = cv2.FONT_HERSHEY_SIMPLEX
@@ -23,8 +25,9 @@ def text(img: np.ndarray, text: str, pos: tuple):
                 fontColor,
                 lineType)
 
+
 def print_line(text: str):
-    space = ' ' * 10
+    space = ' ' * 20
     print(f'{text} {space}', end='\r')
 
 
@@ -61,41 +64,43 @@ def check_selection(state, keep):
     [x, y] = target.center - current.center
     if abs(x) > abs(y):
         if x > 0:
-            print_line(f'move right from {current.value} towards {target.value}')
+            print_line(
+                f'move right from {current.value} towards {target.value}')
         else:
-            print_line(f'move left from {current.value} towards {target.value}')
+            print_line(
+                f'move left from {current.value} towards {target.value}')
     else:
         if y > 0:
-            print_line(f'move down from {current.value} towards {target.value}')
+            print_line(
+                f'move down from {current.value} towards {target.value}')
         else:
             print_line(f'move up from {current.value} towards {target.value}')
 
     return False
 
 
-while True:
-    try:
-        state = recognize_state()
+def play():
+    while True:
+        try:
+            state = recognize_state()
 
-        if not state.is_hero_turn or len(state.dice) == 0 or state.score.goal != MAX_POINTS:
-            print_line(f'Waiting for hero\'s turn')
-            continue
+            if not state.is_hero_turn or len(state.dice) == 0 or state.score.goal != MAX_POINTS:
+                print_line(f'Waiting for hero\'s turn')
+                continue
 
-        dice = [d.value for d in state.dice]
-        (keep, should_roll) = move(dice, MAX_POINTS, state.score.hero_round,
-                                   state.score.hero_total, state.score.opp_total)
+            dice = [d.value for d in state.dice]
+            (keep, should_roll) = move(dice, MAX_POINTS, state.score.hero_round,
+                                       state.score.hero_total, state.score.opp_total)
 
-        show_dice(state.dice)
+            show_dice(state.dice)
 
-        if not check_selection(state, keep):
-            continue
+            if not check_selection(state, keep):
+                continue
 
-
-
-        if should_roll:
-            print_line(f'Roll')
-        else:
-            print_line(f'Bank')
-    except:
-        e = sys.exc_info()[0]
-        print_line(f'failed with {e}')
+            if should_roll:
+                print_line(f'Roll')
+            else:
+                print_line(f'Bank')
+        except:
+            e = sys.exc_info()[0]
+            print(f'failed with {e}\n')

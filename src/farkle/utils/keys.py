@@ -2,7 +2,7 @@
 
 import ctypes
 from threading import Thread
-from time import time, sleep
+from time import sleep
 from queue import Queue
 
 
