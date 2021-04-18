@@ -9,20 +9,37 @@ The dice value recognition is handled by a simple convolutional neural network, 
 The instructions are written for Windows command line, but it's almost identical for bash
 
 - Clone the project
-`git clone https://github.com/keenua/farkle`
-- Switch to 
-- (Optional) Create a virtual environment with Python 3.7 (using `venv` only as an example)
-`python -m venv env`
-- (Optional) Activate the environment
-`.\env\Scripts\activate`
+```
+git clone https://github.com/keenua/farkle
+```
+- Switch to the project directory
+```
+cd farkle
+```
+- ***(Optional)*** Create a virtual environment with Python 3.7 (using `venv` only as an example)
+```
+python -m venv env
+```
+- ***(Optional)*** Activate the environment
+```
+.\env\Scripts\activate
+```
 - Install the dependencies
-`pip install -r requirements.txt`
+```
+pip install -r requirements.txt
+```
 - Switch to `src` folder
-`cd src`
+```
+cd src
+```
 - Train the MDP model. It'll probably take a lot of time depending on your specs. The output file (`4000_parallel.pkl.npy`) would be ~1GB.
-`python -m farkle -a train`
+```
+python -m farkle -a train
+```
 - Run the bot
-`python -m farkle`
+```
+python -m farkle
+```
 - Launch the `Kingdom Come: Deliverance` game and sit at the Farkle table. The bot should start printing suggestions as soon as it's your move. Until then it should be showing `Waiting for hero's turn` message
 
 # Issues
