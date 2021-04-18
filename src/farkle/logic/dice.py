@@ -8,7 +8,7 @@ class Dice:
         self.values = values
 
     def get_max_score(self) -> Tuple[int, 'Dice']:
-        initial:CombState = (0, self.values, True)
+        initial = CombState(0, self.values, True)
 
         queue = deque([initial])
         max_score = 0
@@ -28,7 +28,7 @@ class Dice:
         return max_score, Dice(keep_dice)
 
     def score(self) -> List[int]:
-        initial:CombState = (0, self.values, True)
+        initial = CombState(0, self.values, True)
 
         queue = deque([initial])
         max_score = [0] * len(self.values)
@@ -37,17 +37,16 @@ class Dice:
             state = queue.pop()
             for comb in all_combinations:
                 res = comb(state)
-                score, keep, worked = res
-                if worked:
-                    kept = len(keep)
-                    if score > max_score[kept]:
-                        max_score[kept] = score
+                if res.applied:
+                    kept = len(res.dice)
+                    if res.score > max_score[kept]:
+                        max_score[kept] = res.score
                     queue.append(res)
 
         return max_score
 
     def best_move(self, discard: int) -> List[int]:
-        initial:CombState = (0, self.values, True)
+        initial = CombState(0, self.values, True)
 
         n = len(self.values)
         queue = deque([initial])
@@ -58,12 +57,11 @@ class Dice:
             state = queue.pop()
             for comb in all_combinations:
                 res = comb(state)
-                score, keep, worked = res
-                if worked:
-                    kept = len(keep)
-                    if score > max_score[kept]:
-                        max_score[kept] = score
-                        best_moves[kept] = keep
+                if res.applied:
+                    kept = len(res.dice)
+                    if res.score > max_score[kept]:
+                        max_score[kept] = res.score
+                        best_moves[kept] = res.dice
 
                     queue.append(res)
 

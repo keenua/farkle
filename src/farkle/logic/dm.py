@@ -23,7 +23,7 @@ def move(dice_values: List[int], max_points: int, hero_round: int, hero_total: i
     (reroll, should_roll) = get_best_action(w_cache, score, hero_round, hero_total, opp_total)
     move = dice.best_move(reroll)
 
-    keep = sorted(dice.copy())
+    keep = sorted(dice.values.copy())
     for d in move:
         keep.remove(d)
     
