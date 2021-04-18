@@ -101,6 +101,6 @@ def play():
                 print_line(f'Roll')
             else:
                 print_line(f'Bank')
-        except:
+        except Exception:
             e = sys.exc_info()[0]
             print(f'failed with {e}\n')

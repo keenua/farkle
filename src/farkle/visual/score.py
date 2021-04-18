@@ -55,7 +55,7 @@ def recognize_score(screenshot: str = None) -> Score:
         try:
             text = image_to_string(
                 img, config='--psm 7 --oem 3 -c tessedit_char_whitelist=0123456789')
-        except:
+        except Exception:
             text = None
 
         scores[n] = text
